@@ -13,6 +13,8 @@ namespace AntiCafeConsoleApp.DataAccess.Entity
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string CustomerName { get; set; } = string.Empty;
+        public int EventPackageId { get; set; }
+        public EventPackage EventPackage { get; set; } = null!;
         public Room Room { get; set; } = null!;
     }
 }

@@ -1,11 +1,13 @@
-﻿using AntiCafeConsoleApp.DataAccess.UnitOfWork;
+﻿using AntiCafeConsoleApp.BusinessLogic.DTO;
+using AntiCafeConsoleApp.DataAccess.Entity;
+using AntiCafeConsoleApp.DataAccess.UnitOfWork;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using AntiCafeConsoleApp.BusinessLogic.DTO;
 
 namespace AntiCafeConsoleApp.BusinessLogic
 {
@@ -22,25 +24,40 @@ namespace AntiCafeConsoleApp.BusinessLogic
 
         public async Task<IEnumerable<RoomDto>> GetAvailableRooms(DateTime start, DateTime end)
         {
+            var utcStart = start.ToUniversalTime();
+            var utcEnd = end.ToUniversalTime();
+
             var allRooms = await _uow.Rooms.GetAllAsync();
             var bookings = await _uow.Bookings.GetAllAsync();
 
             Console.WriteLine($"Start: {start}, Finish: {end}");
 
             var busyRoomIds = bookings
-                .Where(b => start < b.EndTime && end > b.StartTime)
+                .Where(b =>
+                {
+                    // Це ключовий момент: нормалізуємо час з БД до UTC для порівняння.
+                    // Якщо DateTimeKind.Unspecified, ToUniversalTime() припускає локальний час
+                    // і перетворює його на UTC. Якщо DateTimeKind.Utc, нічого не змінюється.
+                    DateTime bookingStartUtc = b.StartTime.ToUniversalTime();
+                    DateTime bookingEndUtc = b.EndTime.ToUniversalTime();
+
+                    bool overlaps = utcStart < bookingEndUtc && utcEnd > bookingStartUtc;
+
+                    return overlaps;
+                })
                 .Select(b => b.RoomId)
                 .Distinct();
 
             Console.WriteLine($"Bookings count: {busyRoomIds.Count()}");
 
-            Console.WriteLine($"Busy room IDs: {string.Join(", ", busyRoomIds)}");
+            //Console.WriteLine($"Busy room IDs: {string.Join(", ", busyRoomIds)}");
 
             var availableRooms = allRooms
                 .Where(r => !busyRoomIds.Contains(r.Id));
 
             Console.WriteLine($"Available rooms count: {availableRooms.Count()}");
-            Console.WriteLine($"Booking rooms count: {bookings.Count()}");
+
+            //Console.WriteLine($"Booking rooms count: {bookings.Count()}");
 
             return _mapper.Map<IEnumerable<RoomDto>>(availableRooms);
         }
