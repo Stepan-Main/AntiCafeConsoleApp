@@ -11,12 +11,14 @@ namespace AntiCafeConsoleApp.BusinessLogic
 {
     internal class MappingProfile : Profile
     {
+        // Конфігурація мапінгу між сутностями та DTO
         public MappingProfile()
         {
             CreateMap<Room, RoomDto>();
             CreateMap<Booking, BookingDto>();
             CreateMap<Activity, ActivityDto>();
 
+            // Якщо є DTO → Entity (двостороннє мапування)
             CreateMap<RoomDto, Room>();
             CreateMap<BookingDto, Booking>();
             CreateMap<ActivityDto, Activity>();

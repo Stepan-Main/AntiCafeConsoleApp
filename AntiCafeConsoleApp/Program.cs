@@ -17,6 +17,7 @@ class Program
         Console.OutputEncoding = Encoding.UTF8;
         Console.InputEncoding = Encoding.UTF8;
 
+        // Контекст бази даних
         var dbContext = new AppDbContext();
 
         // Перевірка підключення до бази даних і наявність у ній данних
@@ -28,12 +29,12 @@ class Program
             Console.WriteLine($"Кільлість кімнат в БД: {roomsCount}");
             var bookingsCountInDb = await dbContext.Bookings.CountAsync();
             Console.WriteLine($"Кількість бронювань в БД: {bookingsCountInDb}");
-            await Task.Delay(1000);
+            await Task.Delay(1000); // Затримка для читання повідомлення
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Помилка підключення до бази данних: {ex.Message}");
-            await Task.Delay(1000);
+            await Task.Delay(1000); // Затримка для читання повідомлення
         }
 
         // Ініціалізація юніту робочого процесу та сервісів
@@ -42,6 +43,7 @@ class Program
         // Налаштування AutoMapper
         var config = new MapperConfiguration(cfg =>
         {
+            // Додаємо профіль мапінгу
             cfg.AddProfile<MappingProfile>();
         });
 
@@ -50,7 +52,6 @@ class Program
 
         // Ініціалізація сервісів
         var roomService = new RoomService(uow, mapper);
-        // Ініціалізація сервісу кімнат
         var bookingService = new BookingService(uow);
 
         // Ініціалізація сервісів

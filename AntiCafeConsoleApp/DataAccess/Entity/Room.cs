@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace AntiCafeConsoleApp.DataAccess.Entity
 {
+    // Ентитет для зберігання інформації про кімнати
     internal class Room
     {
         public int Id { get; set; }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace AntiCafeConsoleApp.DataAccess.Entity
 {
+    // Ентитет для зберігання інформації про пакети подій
     internal class EventPackage
     {
         public int Id { get; set; }
